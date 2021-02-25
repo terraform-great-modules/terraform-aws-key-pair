@@ -7,6 +7,7 @@ set -e
 eval "$(jq -r '@sh "KMS_ARN=\(.kms_arn) S3_BUCKET=\(.s3_bucket) S3_KEY=\(.s3_key)"')"
 
 KEYPATH_ENC="$(mktemp --suffix "enc")"
+KEYPATH_PUB="${KEYPATH_ENC}.pub"
 KEYPATH="$(mktemp)"
 
 ssh_exists () {
@@ -38,14 +39,21 @@ gen_key() {
   aws s3 cp "${KEYPATH_ENC}" "s3://${S3_BUCKET}/${S3_KEY}" > /dev/null 
 }
 
+gen_pub() {
+  ssh-keygen -y -f "${KEYPATH_ENC}" > "${KEYPATH_PUB}"
+}
+
 if ! ssh_exists ; then
   gen_key
 else
   get_key
 fi
+gen_pub
+
+PUB=$(< "${KEYPATH_PUB}")
 
 
 # Safely produce a JSON object containing the result value.
 # jq will ensure that the value is properly quoted
 # and escaped to produce a valid JSON string.
-jq -n --arg keypath "$KEYPATH" '{"keypath":$keypath}'
+jq -n --arg keypath "${KEYPATH}" --arg pub "${PUB}" '{"keypath":$keypath, "pub":$pub}'

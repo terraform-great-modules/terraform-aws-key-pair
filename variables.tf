@@ -1,5 +1,6 @@
 
 variable "kms_arn" {
+  default     = ""
   description = "KMS arn for password hiding"
 }
 

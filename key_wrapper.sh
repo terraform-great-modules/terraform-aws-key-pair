@@ -19,7 +19,7 @@ get_key() {
     aws kms decrypt \
         --key-id "${KMS_ARN}" \
         --ciphertext-blob "fileb://${KEYPATH_ENC}" \
-	--output text --query Plaintext | base64 --decode > "${KEYPATH}"
+        --output text --query Plaintext | base64 --decode > "${KEYPATH}"
   else
     mv "${KEYPATH_ENC}" "${KEYPATH}"
   fi

@@ -1,6 +1,6 @@
 
 data "external" "sshkey_wrapper" {
-  program = ["${path.module}/key_wrapper.sh"]
+  program = ["bash", abspath("${path.module}/key_wrapper.sh")]
 
   query = {
     # arbitrary map from strings to strings, passed
